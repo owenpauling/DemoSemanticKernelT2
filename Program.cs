@@ -1,3 +1,5 @@
+using OpenAI;
+using System.ClientModel;
 using Microsoft.Extensions.Configuration;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
@@ -27,8 +29,12 @@ var deploymentName = config["AzureOpenAI:DeploymentName"]
 // Build Semantic Kernel with chat completion + SkynetPlugin
 // ---------------------------------------------------------------------------
 
+var openAIClient = new OpenAIClient(
+    new ApiKeyCredential(apiKey),
+    new OpenAIClientOptions { Endpoint = new Uri(endpoint) });
+
 var builder = Kernel.CreateBuilder();
-builder.AddAzureOpenAIChatCompletion(deploymentName, endpoint, apiKey);
+builder.AddOpenAIChatCompletion(deploymentName, openAIClient);
 builder.Plugins.AddFromType<SkynetPlugin>("Skynet");
 
 var kernel = builder.Build();
